@@ -1,0 +1,18 @@
+# -*- coding: utf-8 -*-
+# vim: ft=yaml
+#
+# Set default values.
+---
+values:
+  pkg:
+    name: cortex-xdr
+  rootgroup: root
+  config: '/etc/cortex-xdr'
+  service:
+    name: cortex-xdr
+  subcomponent:
+    config: '/etc/cortex-xdr-subcomponent-formula.conf'
+  # Just here for testing
+  added_in_defaults: defaults_value
+  winner: defaults
+...

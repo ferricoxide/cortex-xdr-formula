@@ -28,7 +28,7 @@ For formula users
 Quick start: configure per role and per DNS domain name values
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We will see a quick setup to configure the ``TEMPLATE`` formula for different DNS domain names and several roles.
+We will see a quick setup to configure the ``cortex-xdr`` formula for different DNS domain names and several roles.
 
 For this example, I'll define 2 kinds of `fileserver`_ sources:
 
@@ -72,19 +72,19 @@ Create the file ``/etc/salt/master.d/fileserver.conf`` and restart the ``master`
     ...
 
 
-Create per DNS configuration for ``TEMPLATE`` formula
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Create per DNS configuration for ``cortex-xdr`` formula
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Now, we can provides the per DNS domain name configuration files for the ``TEMPLATE`` formulas under ``/srv/salt/TEMPLATE/parameters/``.
+Now, we can provides the per DNS domain name configuration files for the ``cortex-xdr`` formulas under ``/srv/salt/cortex-xdr/parameters/``.
 
 We create the directory for ``dns:domain`` grain and we add a symlink for the ``domain`` grain which is extracted from the minion ``id``:
 
 .. code-block:: console
 
-    mkdir -p /srv/salt/TEMPLATE/parameters/dns:domain/
-    ln -s dns:domain /srv/salt/TEMPLATE/parameters/domain
+    mkdir -p /srv/salt/cortex-xdr/parameters/dns:domain/
+    ln -s dns:domain /srv/salt/cortex-xdr/parameters/domain
 
-We create a configuration for the DNS domain ``example.net`` in ``/srv/salt/TEMPLATE/parameters/dns:domain/example.net.yaml``:
+We create a configuration for the DNS domain ``example.net`` in ``/srv/salt/cortex-xdr/parameters/dns:domain/example.net.yaml``:
 
 .. code-block:: yaml
 
@@ -93,7 +93,7 @@ We create a configuration for the DNS domain ``example.net`` in ``/srv/salt/TEMP
       config: /etc/template-formula-example-net.conf
     ...
 
-We create another configuration for the DNS domain ``example.com`` in the Jinja YAML template ``/srv/salt/TEMPLATE/parameters/dns:domain/example.com.yaml.jinja``:
+We create another configuration for the DNS domain ``example.com`` in the Jinja YAML template ``/srv/salt/cortex-xdr/parameters/dns:domain/example.com.yaml.jinja``:
 
 .. code-block:: yaml
 
@@ -103,23 +103,23 @@ We create another configuration for the DNS domain ``example.com`` in the Jinja 
     ...
 
 
-Create per role configuration for ``TEMPLATE`` formula
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Create per role configuration for ``cortex-xdr`` formula
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Now, we can provides the per role configuration files for the ``TEMPLATE`` formulas under ``/srv/salt/TEMPLATE/parameters/``.
+Now, we can provides the per role configuration files for the ``cortex-xdr`` formulas under ``/srv/salt/cortex-xdr/parameters/``.
 
 We create the directory for roles:
 
 .. code-block:: console
 
-    mkdir -p /srv/salt/TEMPLATE/parameters/roles
+    mkdir -p /srv/salt/cortex-xdr/parameters/roles
 
 We will define 2 roles:
 
-- ``TEMPLATE/server``
-- ``TEMPLATE/client``
+- ``cortex-xdr/server``
+- ``cortex-xdr/client``
 
-We create a configuration for the role ``TEMPLATE/server`` in ``/srv/salt/TEMPLATE/parameters/roles/TEMPLATE/server.yaml``:
+We create a configuration for the role ``cortex-xdr/server`` in ``/srv/salt/cortex-xdr/parameters/roles/cortex-xdr/server.yaml``:
 
 .. code-block:: yaml
 
@@ -128,7 +128,7 @@ We create a configuration for the role ``TEMPLATE/server`` in ``/srv/salt/TEMPLA
       config: /etc/template-formula-server.conf
     ...
 
-We create another configuration for the role ``TEMPLATE/client`` in ``/srv/salt/TEMPLATE/parameters/roles/TEMPLATE/client.yaml``:
+We create another configuration for the role ``cortex-xdr/client`` in ``/srv/salt/cortex-xdr/parameters/roles/cortex-xdr/client.yaml``:
 
 .. code-block:: yaml
 
@@ -185,13 +185,13 @@ For the servers:
 
 .. code-block:: console
 
-    salt 'server-*' grains.append roles TEMPLATE/server
+    salt 'server-*' grains.append roles cortex-xdr/server
 
 For the clients:
 
 .. code-block:: console
 
-    salt 'client-*' grains.append roles TEMPLATE/client
+    salt 'client-*' grains.append roles cortex-xdr/client
 
 .. note::
 
@@ -236,7 +236,7 @@ And then, rename the directory:
 
 .. code-block:: console
 
-    mv /srv/salt/TEMPLATE/parameters/dns:domain/  '/srv/salt/TEMPLATE/parameters/dns!domain/'
+    mv /srv/salt/cortex-xdr/parameters/dns:domain/  '/srv/salt/cortex-xdr/parameters/dns!domain/'
 
 
 Format of configuration YAML files
@@ -458,11 +458,11 @@ Here is the best way to use it in an ``sls`` file:
 
     {#- Get the `tplroot` from `tpldir` #}
     {%- set tplroot = tpldir.split("/")[0] %}
-    {%- from tplroot ~ "/map.jinja" import mapdata as TEMPLATE with context %}
+    {%- from tplroot ~ "/map.jinja" import mapdata as cortex-xdr with context %}
 
-    test-does-nothing-but-display-TEMPLATE-as-json:
+    test-does-nothing-but-display-cortex-xdr-as-json:
       test.nop:
-        - name: {{ TEMPLATE | json }}
+        - name: {{ cortex-xdr | json }}
 
 
 Use formula configuration values in templates
@@ -470,7 +470,7 @@ Use formula configuration values in templates
 
 When you need to process salt templates, you should avoid calling `salt['config.get']`_ (or `salt['pillar.get']`_ and `salt['grains.get']`_) directly from the template. All the needed values should be available within the ``mapdata`` variable exported by ``map.jinja``.
 
-Here is an example based on `template-formula/TEMPLATE/config/file.sls`_:
+Here is an example based on `template-formula/cortex-xdr/config/file.sls`_:
 
 .. code-block:: sls
 
@@ -480,30 +480,30 @@ Here is an example based on `template-formula/TEMPLATE/config/file.sls`_:
     {#- Get the `tplroot` from `tpldir` #}
     {%- set tplroot = tpldir.split('/')[0] %}
     {%- set sls_package_install = tplroot ~ '.package.install' %}
-    {%- from tplroot ~ "/map.jinja" import mapdata as TEMPLATE with context %}
+    {%- from tplroot ~ "/map.jinja" import mapdata as cortex-xdr with context %}
     {%- from tplroot ~ "/libtofs.jinja" import files_switch with context %}
 
     include:
       - {{ sls_package_install }}
 
-    TEMPLATE-config-file-file-managed:
+    cortex-xdr-config-file-file-managed:
       file.managed:
-        - name: {{ TEMPLATE.config }}
+        - name: {{ cortex-xdr.config }}
         - source: {{ files_switch(['example.tmpl'],
-                                  lookup='TEMPLATE-config-file-file-managed'
+                                  lookup='cortex-xdr-config-file-file-managed'
                      )
                   }}
         - mode: 644
         - user: root
-        - group: {{ TEMPLATE.rootgroup }}
+        - group: {{ cortex-xdr.rootgroup }}
         - makedirs: True
         - template: jinja
         - require:
           - sls: {{ sls_package_install }}
         - context:
-            TEMPLATE: {{ TEMPLATE | json }}
+            cortex-xdr: {{ cortex-xdr | json }}
 
-This ``sls`` file expose a ``TEMPLATE`` context variable to the jinja template which could be used like this:
+This ``sls`` file expose a ``cortex-xdr`` context variable to the jinja template which could be used like this:
 
 .. code-block:: jinja
 
@@ -515,9 +515,9 @@ This ``sls`` file expose a ``TEMPLATE`` context variable to the jinja template w
     This is another example file from SaltStack template-formula.
 
     # This is here for testing purposes
-    {{ TEMPLATE | json }}
+    {{ cortex-xdr | json }}
 
-    winner of the merge: {{ TEMPLATE['winner'] }}
+    winner of the merge: {{ cortex-xdr['winner'] }}
 
 
 .. _documentation: https://docs.saltproject.io/en/latest/topics/development/conventions/formulas.html#writing-formulas
@@ -538,5 +538,5 @@ This ``sls`` file expose a ``TEMPLATE`` context variable to the jinja template w
 .. _salt.slsutil.merge: https://docs.saltproject.io/en/latest/ref/modules/all/salt.modules.slsutil.html#salt.modules.slsutil.merge
 .. _traverse: https://docs.saltproject.io/en/latest/topics/jinja/index.html#traverse
 .. _salt-ssh: https://docs.saltproject.io/en/latest/topics/ssh/
-.. _template-formula/TEMPLATE/config/file.sls: https://github.com/saltstack-formulas/template-formula/blob/master/TEMPLATE/config/file.sls
+.. _template-formula/cortex-xdr/config/file.sls: https://github.com/saltstack-formulas/template-formula/blob/master/cortex-xdr/config/file.sls
 .. _bug 58726: https://github.com/saltstack/salt/issues/58726

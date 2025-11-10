@@ -2,7 +2,7 @@
 
 require 'yaml'
 
-control 'TEMPLATE._mapdata' do
+control 'cortex-xdr._mapdata' do
   title '`map.jinja` should match the reference file'
 
   ### Method
